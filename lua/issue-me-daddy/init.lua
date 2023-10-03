@@ -1,3 +1,5 @@
+print("issue-me-daddy init.lua sourced!")
+
 local M = {}
 
 M.setup = function()
