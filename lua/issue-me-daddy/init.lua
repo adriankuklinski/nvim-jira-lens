@@ -1,22 +1,33 @@
 local M = {}
+M.config = {}
 
-M.setup = function()
-    local utils = require'issue-me-daddy.utils'
+-- Setup function to initialize and configure the plugin
+M.setup = function(opts)
+    -- Use provided options or default to an empty table
+    opts = opts or {}
 
-    local file_path = vim.fn.expand("~/.issue_me_daddy_credentials")
-    local username, password, base_url = utils.load_credentials_from_file(file_path)
+    -- Default configuration values
+    local default_opts = {
+        username = "",
+        password = "",
+        base_url = "",
+    }
 
-    if username and username ~= "" and password and password ~= "" and base_url and base_url ~= "" then
-        require'issue-me-daddy.config'.set_credentials(username, password, base_url)
+    -- Overwrite defaults with user provided options where available
+    for k, v in pairs(default_opts) do
+        if opts[k] == nil then
+            opts[k] = v
+        end
     end
+
+    local required_opts = {"base_url", "username", "password"}
+    for _, opt in ipairs(required_opts) do
+        if not opts[opt] or opts[opt] == "" then
+            error(string.format("You must provide a valid %s for issue-me-daddy!", opt))
+        end
+    end
+
+    M.config = opts
 end
 
-vim.cmd [[
-augroup issue_me_daddy_auto_setup
-    autocmd!
-    autocmd VimEnter * lua require'issue-me-daddy'.setup()
-augroup END
-]]
-
 return M
-
