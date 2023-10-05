@@ -1,5 +1,7 @@
 local M = {}
 
+local url_encode = require("issue-me-daddy.utils").url_encode
+
 local cjson = require("cjson")
 local http = require("socket.http")
 
@@ -13,7 +15,7 @@ M.get_my_issues = function(config)
         config.username
     )
 
-    local url = string.format("%s/rest/api/2/search?jql=%s", base_url, http.encode(jql_query))
+    local url = string.format("%s/rest/api/2/search?jql=%s", base_url, url_encode(jql_query))
 
     local response = http.request({
         url = url,
