@@ -16,7 +16,7 @@ M.get_my_issues = function(config)
     )
 
     local url = string.format("%s/rest/api/2/search?jql=%s", base_url, url_encode(jql_query))
-    local r, c, h = http.request({
+    local r, c, h, b = http.request({
         url = url,
         method = "GET",
         headers = {
@@ -28,6 +28,7 @@ M.get_my_issues = function(config)
     print(vim.inspect(r))
     print(vim.inspect(c))
     print(vim.inspect(h))
+    print(vim.inspect(b))
 end
 
 return M
