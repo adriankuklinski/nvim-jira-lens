@@ -24,7 +24,7 @@ M.get_my_issues = function(config)
     -- The sink function that will capture the data
     local sink = ltn12.sink.table(chunks)
 
-    local r, c, h = http.request({
+    http.request({
         url = url,
         method = "GET",
         headers = {
@@ -35,10 +35,9 @@ M.get_my_issues = function(config)
     })
 
     local body = table.concat(chunks)
-    print(vim.inspect(r))
-    print(vim.inspect(c))
-    print(vim.inspect(h))
-    print(vim.inspect(body))
+    local data = cjson.decode(body)
+
+    return data
 end
 
 return M
