@@ -36,8 +36,18 @@ M.get_my_issues = function(config)
 
     local body = table.concat(chunks)
     local data = cjson.decode(body)
+    local extracted_data = {}
 
-    return data
+    for i, issue in ipairs(data.issues) do
+        local issue_data = {
+            key = issue.key,
+            summary = issue.fields.summary,
+            description = issue.fields.status.name
+        }
+        table.insert(extracted_data, issue_data)
+    end
+
+    return extracted_data
 end
 
 return M
