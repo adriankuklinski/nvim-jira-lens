@@ -7,7 +7,7 @@ local http = require("socket.http")
 
 M.get_my_issues = function(config)
     local base_url = config.base_url
-    local auth = "Basic " .. vim.fn.system("echo -n " .. config.username .. ":" .. config.password .. " | base64")
+    local auth = "Basic " .. vim.fn.system("echo -n " .. config.username .. ":" .. config.password .. " | base64"):gsub("\n", "")
 
     print(vim.inspect(auth))
 
