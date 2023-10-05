@@ -1,7 +1,12 @@
 local M = {}
 
-local telescope = require'telescope'
 local api = require'issue-me-daddy.api'
+
+local actions = require('telescope.actions')
+local finders = require('telescope.finders')
+local pickers = require('telescope.pickers')
+local previewers = require('telescope.previewers')
+local conf = require('telescope.config').values
 
 M.show_issues = function(config)
     local issues = api.get_my_issues(config)
@@ -16,19 +21,32 @@ M.show_issues = function(config)
         })
     end
 
-    print(vim.inspect(telescope.builtin))
-    -- Use Telescope to display the issues
-    telescope.pickers.new({}, {
-        prompt_title = "My Jira Issues",
-        finder = telescope.finders.new_table({
+    pickers.new({}, {
+        prompt_title = 'Jira Issues',
+        finder    = finders.new_table({
             results = issue_entries,
+            entry_maker = function(entry)
+                return entry
+            end,
         }),
-        sorter = telescope.config.values.generic_sorter({}),
-        previewer = telescope.previewers.new_buffer_previewer({
+        sorter    = conf.generic_sorter({}),
+        previewer = previewers.new_buffer_previewer({
             define_preview = function(self, entry, status)
-                return entry.description
-            end
+                local issue = entry.value
+                local description = issue.description
+                self.displayed = true
+                local bufnr = self.state.bufnr
+                vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, vim.split(description, "\n"))
+            end,
         }),
+        attach_mappings = function(prompt_bufnr)
+            actions.goto_file_selection_edit:replace(function()
+                local entry = actions.get_selected_entry()
+                actions.close(prompt_bufnr)
+                -- Do something with the selected entry if necessary
+            end)
+            return true
+        end,
     }):find()
 end
 
