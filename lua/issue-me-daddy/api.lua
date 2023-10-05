@@ -47,6 +47,7 @@ M.get_my_issues = function(config)
         table.insert(extracted_data, issue_data)
     end
 
+    print(vim.inspect(data))
     return extracted_data
 end
 
