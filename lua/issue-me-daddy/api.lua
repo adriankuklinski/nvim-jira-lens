@@ -17,7 +17,7 @@ M.get_my_issues = function(config)
 
     local url = string.format("%s/rest/api/2/search?jql=%s", base_url, url_encode(jql_query))
 
-    local response = http.request({
+    local response, status, headers = http.request({
         url = url,
         method = "GET",
         headers = {
@@ -25,6 +25,12 @@ M.get_my_issues = function(config)
             ["Content-Type"] = "application/json",
         }
     })
+
+    print("Response:", response)
+    print("Status:", status)
+    for k, v in pairs(headers) do
+        print(string.format("Header: %s: %s", k, v))
+    end
 
     local data = cjson.decode(response)
 
