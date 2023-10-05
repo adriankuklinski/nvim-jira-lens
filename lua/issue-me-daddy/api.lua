@@ -16,7 +16,7 @@ M.get_my_issues = function(config)
     )
 
     local url = string.format("%s/rest/api/2/search?jql=%s", base_url, url_encode(jql_query))
-    local response = http.request({
+    local r, c, h = http.request({
         url = url,
         method = "GET",
         headers = {
@@ -25,10 +25,9 @@ M.get_my_issues = function(config)
         }
     })
 
-    print(vim.inspect(response))
-    local data = cjson.decode(response)
-
-    return data
+    print(vim.inspect(r))
+    print(vim.inspect(c))
+    print(vim.inspect(h))
 end
 
 return M
