@@ -45,6 +45,7 @@ M.get_my_issues = function(config)
             description = issue.fields.description,
             status = issue.fields.status.name,
         }
+
         table.insert(extracted_data, issue_data)
     end
 

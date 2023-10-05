@@ -1,7 +1,7 @@
 local M = {}
 
-local telescope = require('telescope')
-local api = require('issue-me-daddy.api')
+local telescope = require'telescope'
+local api = require'issue-me-daddy.api'
 
 M.show_issues = function(config)
     local issues = api.get_my_issues(config)
