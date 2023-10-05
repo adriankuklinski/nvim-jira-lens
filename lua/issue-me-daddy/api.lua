@@ -9,6 +9,8 @@ M.get_my_issues = function(config)
     local base_url = config.base_url
     local auth = "Basic " .. vim.fn.system("echo -n " .. config.username .. ":" .. config.password .. " | base64")
 
+    print(vim.inspect(auth))
+
     -- Constructing the JQL query:
     local jql_query = string.format(
         "assignee='%s' AND (status='In Progress' OR status='In Review')",
