@@ -9,8 +9,6 @@ M.get_my_issues = function(config)
     local base_url = config.base_url
     local auth = "Basic " .. vim.fn.system("echo -n " .. config.username .. ":" .. config.password .. " | base64"):gsub("\n", "")
 
-    print(vim.inspect(auth))
-
     -- Constructing the JQL query:
     local jql_query = string.format(
         "assignee='%s' AND (status='In Progress' OR status='In Review')",
@@ -18,10 +16,7 @@ M.get_my_issues = function(config)
     )
 
     local url = string.format("%s/rest/api/2/search?jql=%s", base_url, url_encode(jql_query))
-
-    print(vim.inspect(url))
-
-    local response, status, headers = http.request({
+    local response = http.request({
         url = url,
         method = "GET",
         headers = {
@@ -29,12 +24,6 @@ M.get_my_issues = function(config)
             ["Content-Type"] = "application/json",
         }
     })
-
-    print("Response:", response)
-    print("Status:", status)
-    for k, v in pairs(headers) do
-        print(string.format("Header: %s: %s", k, v))
-    end
 
     local data = cjson.decode(response)
 
