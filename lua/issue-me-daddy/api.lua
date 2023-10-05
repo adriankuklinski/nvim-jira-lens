@@ -1,5 +1,6 @@
 local M = {}
 
+local cjson = require("cjson")
 local http = require("socket.http")
 
 M.get_my_issues = function(config)
@@ -23,7 +24,9 @@ M.get_my_issues = function(config)
         }
     })
 
-    return response
+    local data = cjson.decode(response)
+
+    return data
 end
 
 return M
