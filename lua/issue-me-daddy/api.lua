@@ -42,12 +42,12 @@ M.get_my_issues = function(config)
         local issue_data = {
             key = issue.key,
             summary = issue.fields.summary,
-            description = issue.fields.status.name
+            description = issue.fields.description,
+            status = issue.fields.status.name,
         }
         table.insert(extracted_data, issue_data)
     end
 
-    print(vim.inspect(data))
     return extracted_data
 end
 
