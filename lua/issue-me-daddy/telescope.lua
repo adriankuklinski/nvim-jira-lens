@@ -16,7 +16,7 @@ M.show_issues = function(config)
         })
     end
 
-    print(vim.inspect(telescope))
+    print(vim.inspect(telescope.builtin))
     -- Use Telescope to display the issues
     telescope.pickers.new({}, {
         prompt_title = "My Jira Issues",
