@@ -25,6 +25,7 @@ M.get_my_issues = function(config)
         }
     })
 
+    print(vim.inspect(response))
     local data = cjson.decode(response)
 
     return data
