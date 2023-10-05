@@ -4,6 +4,7 @@ local url_encode = require("issue-me-daddy.utils").url_encode
 
 local cjson = require("cjson")
 local http = require("socket.http")
+local ltn12 = require("ltn12")
 
 M.get_my_issues = function(config)
     local base_url = config.base_url
@@ -16,20 +17,28 @@ M.get_my_issues = function(config)
     )
 
     local url = string.format("%s/rest/api/2/search?jql=%s", base_url, url_encode(jql_query))
-    local r, c, h, b, x = http.request({
+
+    -- Create an empty table to hold the chunks of data
+    local chunks = {}
+
+    -- The sink function that will capture the data
+    local sink = ltn12.sink.table(chunks)
+
+    local r, c, h = http.request({
         url = url,
         method = "GET",
         headers = {
             ["Authorization"] = auth,
             ["Content-Type"] = "application/json",
-        }
+        },
+        sink = sink
     })
 
+    local body = table.concat(chunks)
     print(vim.inspect(r))
     print(vim.inspect(c))
     print(vim.inspect(h))
-    print(vim.inspect(b))
-    print(vim.inspect(x))
+    print(vim.inspect(body))
 end
 
 return M
