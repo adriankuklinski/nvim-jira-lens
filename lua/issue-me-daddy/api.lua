@@ -45,22 +45,26 @@ M.get_my_issues = function(config)
     stdout:read_start(function(err, data)
         assert(not err, err)
         if data then
-            -- Parse the response data:
-            local parsed_data = vim.fn.json_decode(data)
-            local extracted_data = {}
+            -- Defer the parsing and processing of the response data:
+            vim.schedule(function()
+                -- Parse the response data:
+                local parsed_data = vim.fn.json_decode(data)
+                local extracted_data = {}
 
-            for _, issue in ipairs(parsed_data.issues or {}) do
-                local issue_data = {
-                    key = issue.key,
-                    summary = issue.fields.summary,
-                    description = issue.fields.description,
-                    status = issue.fields.status.name,
-                }
+                for i, issue in ipairs(parsed_data.issues or {}) do
+                    local issue_data = {
+                        key = issue.key,
+                        summary = issue.fields.summary,
+                        description = issue.fields.description,
+                        status = issue.fields.status.name,
+                    }
 
-                table.insert(extracted_data, issue_data)
-            end
+                    table.insert(extracted_data, issue_data)
+                end
 
-            json.save(extracted_data)
+                -- Save the extracted data:
+                json.save(extracted_data)
+            end)
         end
     end)
 end
