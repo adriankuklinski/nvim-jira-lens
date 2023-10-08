@@ -53,22 +53,24 @@ M.get_my_issues = function(config)
         else
             -- No more data, concatenate all chunks and parse the JSON:
             local data_str = table.concat(data_chunks)
-            local parsed_data = vim.fn.json_decode(data_str)
-            local extracted_data = {}
+            vim.schedule(function()
+                local parsed_data = vim.fn.json_decode(data_str)
+                local extracted_data = {}
 
-            for _, issue in ipairs(parsed_data.issues or {}) do
-                local issue_data = {
-                    key = issue.key,
-                    summary = issue.fields.summary,
-                    description = issue.fields.description,
-                    status = issue.fields.status.name,
-                }
+                for _, issue in ipairs(parsed_data.issues or {}) do
+                    local issue_data = {
+                        key = issue.key,
+                        summary = issue.fields.summary,
+                        description = issue.fields.description,
+                        status = issue.fields.status.name,
+                    }
 
-                table.insert(extracted_data, issue_data)
-            end
+                    table.insert(extracted_data, issue_data)
+                end
 
-            -- Save the extracted data:
-            json.save(extracted_data)
+                -- Save the extracted data:
+                json.save(extracted_data)
+            end)
         end
     end)
 end
