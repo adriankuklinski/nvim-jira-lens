@@ -1,11 +1,7 @@
 local M = {}
 
-local url_encode = require("issue-me-daddy.utils").url_encode
-local save = require("issue-me-daddy.json").save
-
-local cjson = require("cjson")
-local http = require("socket.http")
-local ltn12 = require("ltn12")
+local utils = require("issue-me-daddy.utils")
+local json = require("issue-me-daddy.json")
 
 M.get_my_issues = function(config)
     local base_url = config.base_url
@@ -17,40 +13,56 @@ M.get_my_issues = function(config)
         config.username
     )
 
-    local url = string.format("%s/rest/api/2/search?jql=%s", base_url, url_encode(jql_query))
+    -- Compose Jira url string
+    local url = string.format("%s/rest/api/2/search?jql=%s", base_url, utils.url_encode(jql_query))
 
-    -- Create an empty table to hold the chunks of data
-    local chunks = {}
+    -- Prepare the curl command:
+    local cmd = string.format(
+        "curl -s -H 'Authorization: %s' -H 'Content-Type: application/json' '%s'",
+        auth,
+        url
+    )
 
-    -- The sink function that will capture the data
-    local sink = ltn12.sink.table(chunks)
+    -- Create pipes for stdout and stderr:
+    local stdout = vim.uv.new_pipe(false)
+    local stderr = vim.uv.new_pipe(false)
 
-    http.request({
-        url = url,
-        method = "GET",
-        headers = {
-            ["Authorization"] = auth,
-            ["Content-Type"] = "application/json",
-        },
-        sink = sink
-    })
+    -- Spawn a new job to execute the curl command:
+    local handle
+    handle, _ = vim.uv.spawn('bash', {
+        args = {'-c', cmd},
+        stdio = {nil, stdout, stderr}
+    }, function(_, _)
+        -- This callback is executed when the process exits
+        stdout:read_stop()
+        stderr:read_stop()
+        stdout:close()
+        stderr:close()
+        handle:close()
+    end)
 
-    local body = table.concat(chunks)
-    local data = cjson.decode(body)
-    local extracted_data = {}
+    -- Read the response data from stdout:
+    stdout:read_start(function(err, data)
+        assert(not err, err)
+        if data then
+            -- Parse the response data:
+            local parsed_data = vim.fn.json_decode(data)
+            local extracted_data = {}
 
-    for i, issue in ipairs(data.issues) do
-        local issue_data = {
-            key = issue.key,
-            summary = issue.fields.summary,
-            description = issue.fields.description,
-            status = issue.fields.status.name,
-        }
+            for _, issue in ipairs(parsed_data.issues or {}) do
+                local issue_data = {
+                    key = issue.key,
+                    summary = issue.fields.summary,
+                    description = issue.fields.description,
+                    status = issue.fields.status.name,
+                }
 
-        table.insert(extracted_data, issue_data)
-    end
+                table.insert(extracted_data, issue_data)
+            end
 
-    save(extracted_data)
+            json.save(extracted_data)
+        end
+    end)
 end
 
 return M
