@@ -41,30 +41,34 @@ M.get_my_issues = function(config)
         handle:close()
     end)
 
+    -- Create an empty table to accumulate data chunks:
+    local data_chunks = {}
+
     -- Read the response data from stdout:
     stdout:read_start(function(err, data)
         assert(not err, err)
         if data then
-            -- Defer the parsing and processing of the response data:
-            vim.schedule(function()
-                -- Parse the response data:
-                local parsed_data = vim.fn.json_decode(data)
-                local extracted_data = {}
+            -- Accumulate data chunks:
+            table.insert(data_chunks, data)
+        else
+            -- No more data, concatenate all chunks and parse the JSON:
+            local data_str = table.concat(data_chunks)
+            local parsed_data = vim.fn.json_decode(data_str)
+            local extracted_data = {}
 
-                for i, issue in ipairs(parsed_data.issues or {}) do
-                    local issue_data = {
-                        key = issue.key,
-                        summary = issue.fields.summary,
-                        description = issue.fields.description,
-                        status = issue.fields.status.name,
-                    }
+            for _, issue in ipairs(parsed_data.issues or {}) do
+                local issue_data = {
+                    key = issue.key,
+                    summary = issue.fields.summary,
+                    description = issue.fields.description,
+                    status = issue.fields.status.name,
+                }
 
-                    table.insert(extracted_data, issue_data)
-                end
+                table.insert(extracted_data, issue_data)
+            end
 
-                -- Save the extracted data:
-                json.save(extracted_data)
-            end)
+            -- Save the extracted data:
+            json.save(extracted_data)
         end
     end)
 end
