@@ -50,4 +50,3 @@ M.show_issues = function()
 end
 
 return M
-
