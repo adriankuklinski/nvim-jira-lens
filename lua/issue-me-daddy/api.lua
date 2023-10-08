@@ -1,6 +1,7 @@
 local M = {}
 
 local url_encode = require("issue-me-daddy.utils").url_encode
+local save = require("issue-me-daddy.json").save
 
 local cjson = require("cjson")
 local http = require("socket.http")
@@ -49,7 +50,7 @@ M.get_my_issues = function(config)
         table.insert(extracted_data, issue_data)
     end
 
-    return extracted_data
+    save(extracted_data)
 end
 
 return M
