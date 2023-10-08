@@ -7,6 +7,9 @@ local conf = require('telescope.config').values
 local actions = require('telescope.actions')
 
 M.show_issues = function()
+    local config = require("issue-me-daddy").config
+    require'issue-me-daddy.api'.get_my_issues(config)
+
     local issues = require("issue-me-daddy.json").load()
 
     if not issues or #issues == 0 then
