@@ -1,6 +1,6 @@
 local M = {}
 
-function M.url_encode(str)
+M.url_encode = function(str)
     if (str) then
         str = string.gsub(str, "\n", "\r\n")
         str = string.gsub(str, "([^%w %-%_%.%~])",
@@ -9,5 +9,6 @@ function M.url_encode(str)
     end
     return str
 end
+
 
 return M
