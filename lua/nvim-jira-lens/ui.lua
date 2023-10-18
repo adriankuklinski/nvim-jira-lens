@@ -46,6 +46,8 @@ M.show_issues = function()
                 local description = entry.description
                 local bufnr = self.state.bufnr
                 if not bufnr then return end
+
+                vim.api.nvim_buf_set_option(bufnr, 'wrap', true)
                 vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, vim.split(description or '', "\n"))
             end,
         }),
