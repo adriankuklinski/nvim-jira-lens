@@ -59,8 +59,12 @@ M.show_issues = function()
                 actions.close(prompt_bufnr)
 
                 local filename = "~/workspace/jira/" .. entry.value .. ".txt"
+                local file_exists = vim.fn.filereadable(filename) == 1
                 vim.cmd('e ' .. filename)
-                vim.api.nvim_buf_set_lines(0, 0, -1, false, vim.split(entry.description or '', "\n"))
+
+                if not file_exists then
+                    vim.api.nvim_buf_set_lines(0, 0, -1, false, vim.split(entry.description or '', "\n"))
+                end
             end
 
             map('i', '<CR>', create_and_populate_file)
