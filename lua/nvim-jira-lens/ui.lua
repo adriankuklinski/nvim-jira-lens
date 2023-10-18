@@ -53,9 +53,18 @@ M.show_issues = function()
                 end
             end,
         }),
-        attach_mappings = function(_, map)
-            map('i', '<CR>', actions.select_default)
-            map('n', '<CR>', actions.select_default)
+        attach_mappings = function(prompt_bufnr, map)
+            local create_and_populate_file = function()
+                local entry = actions.get_selected_entry(prompt_bufnr)
+                actions.close(prompt_bufnr)
+
+                local filename = "~/workspace/jira/" .. entry.value .. ".txt"
+                vim.cmd('e ' .. filename)
+                vim.api.nvim_buf_set_lines(0, 0, -1, false, vim.split(entry.description or '', "\n"))
+            end
+
+            map('i', '<CR>', create_and_populate_file)
+            map('n', '<CR>', create_and_populate_file)
             return true
         end,
     }):find()
