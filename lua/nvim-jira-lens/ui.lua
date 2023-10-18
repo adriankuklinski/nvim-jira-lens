@@ -55,7 +55,7 @@ M.show_issues = function()
         }),
         attach_mappings = function(prompt_bufnr, map)
             local create_and_populate_file = function()
-                local entry = actions.get_selected_entry(prompt_bufnr)
+                local entry = actions.state.get_selected_entry(prompt_bufnr)
                 actions.close(prompt_bufnr)
 
                 local filename = "~/workspace/jira/" .. entry.value .. ".txt"
