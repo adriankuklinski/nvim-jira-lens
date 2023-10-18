@@ -47,8 +47,11 @@ M.show_issues = function()
                 local bufnr = self.state.bufnr
                 if not bufnr then return end
 
-                vim.api.nvim_buf_set_option(bufnr, 'wrap', true)
                 vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, vim.split(description or '', "\n"))
+                local win_id = vim.api.nvim_buf_get_windows(bufnr)[1]
+                if win_id then
+                    vim.api.nvim_win_set_option(win_id, 'wrap', true)
+                end
             end,
         }),
         attach_mappings = function(_, map)
